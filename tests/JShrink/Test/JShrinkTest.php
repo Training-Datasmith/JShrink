@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the JShrink package.
  *
@@ -10,8 +12,6 @@
  */
 
 namespace JShrink\Test;
-
-use JShrink\Minifier;
 
 class JShrinkTest extends \PHPUnit_Framework_TestCase
 {
@@ -99,17 +99,18 @@ class JShrinkTest extends \PHPUnit_Framework_TestCase
         $testDir = $baseDir . 'input/';
         $expectDir = $baseDir . 'output/';
 
-        $returnData = array();
+        $returnData = [];
 
         $testFiles = scandir($testDir);
         foreach ($testFiles as $testFile) {
-            if(substr($testFile, -3) !== '.js' || !file_exists(($expectDir . $testFile)))
+            if (substr($testFile, -3) !== '.js' || !file_exists(($expectDir . $testFile))) {
                 continue;
+            }
 
             $testInput = file_get_contents($testDir . $testFile);
             $testOutput = file_get_contents($expectDir . $testFile);
 
-            $returnData[] = array($testFile, $testInput, $testOutput);
+            $returnData[] = [$testFile, $testInput, $testOutput];
         }
 
         return $returnData;

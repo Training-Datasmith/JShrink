@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the JShrink package.
  *
@@ -81,7 +83,7 @@ class Minifier
      *
      * @var array
      */
-    protected static $defaultOptions = array('flaggedComments' => true);
+    protected static $defaultOptions = ['flaggedComments' => true];
 
     /**
      * Contains lock ids which are used to replace certain code patterns and
@@ -89,7 +91,7 @@ class Minifier
      *
      * @var array
      */
-    protected $locks = array();
+    protected $locks = [];
 
     /**
      * Takes a string containing javascript and removes unneeded characters in
@@ -100,7 +102,7 @@ class Minifier
      * @throws \Exception
      * @return bool|string
      */
-    public static function minify($js, $options = array())
+    public static function minify($js, $options = [])
     {
         try {
             ob_start();
@@ -186,14 +188,17 @@ class Minifier
 
                     // if B is a space we skip the rest of the switch block and go down to the
                     // string/regex check below, resetting $this->b with getReal
-                    if($this->b === ' ')
+                    if ($this->b === ' ') {
                         break;
+                    }
 
-                // otherwise we treat the newline like a space
+                    // otherwise we treat the newline like a space
 
+                    // no break
                 case ' ':
-                    if(static::isAlphaNumeric($this->b))
+                    if (static::isAlphaNumeric($this->b)) {
                         echo $this->a;
+                    }
 
                     $this->saveString();
                     break;
@@ -214,9 +219,11 @@ class Minifier
                             break;
 
                         case ' ':
-                            if(!static::isAlphaNumeric($this->a))
+                            if (!static::isAlphaNumeric($this->a)) {
                                 break;
+                            }
 
+                            // no break
                         default:
                             // check for some regex that breaks stuff
                             if ($this->a === '/' && ($this->b === '\'' || $this->b === '"')) {
@@ -233,8 +240,9 @@ class Minifier
             // do reg check of doom
             $this->b = $this->getReal();
 
-            if(($this->b == '/' && strpos('(,=:[!&|?', $this->a) !== false))
+            if (($this->b == '/' && strpos('(,=:[!&|?', $this->a) !== false)) {
                 $this->saveRegex();
+            }
         }
     }
 
@@ -264,7 +272,7 @@ class Minifier
             $char = $this->c;
             unset($this->c);
 
-        // Otherwise we start pulling from the input.
+            // Otherwise we start pulling from the input.
         } else {
             $char = substr($this->input, $this->index, 1);
 
@@ -279,9 +287,10 @@ class Minifier
 
         // Normalize all whitespace except for the newline character into a
         // standard space.
-        if($char !== "\n" && ord($char) < 32)
+        if ($char !== "\n" && ord($char) < 32) {
 
             return ' ';
+        }
 
         return $char;
     }
@@ -365,13 +374,13 @@ class Minifier
 
             // Now we reinsert conditional comments and YUI-style licensing comments
             if (($this->options['flaggedComments'] && $thirdCommentString === '!')
-                || ($thirdCommentString === '@') ) {
+                || ($thirdCommentString === '@')) {
 
                 // If conditional comments or flagged comments are not the first thing in the script
                 // we need to echo a and fill it with a space before moving on.
                 if ($startIndex > 0) {
                     echo $this->a;
-                    $this->a = " ";
+                    $this->a = ' ';
 
                     // If the comment started on a new line we let it stay on the new line
                     if ($this->input[($startIndex - 1)] === "\n") {
@@ -389,12 +398,14 @@ class Minifier
             $char = false;
         }
 
-        if($char === false)
+        if ($char === false) {
             throw new \RuntimeException('Unclosed multiline comment at position: ' . ($this->index - 2));
+        }
 
         // if we're here c is part of the comment and therefore tossed
-        if(isset($this->c))
+        if (isset($this->c)) {
             unset($this->c);
+        }
 
         return $char;
     }
@@ -413,9 +424,10 @@ class Minifier
         $pos = strpos($this->input, $string, $this->index);
 
         // If it's not there return false.
-        if($pos === false)
+        if ($pos === false) {
 
             return false;
+        }
 
         // Adjust position of index to jump ahead to the asked for string
         $this->index = $pos;
@@ -463,14 +475,14 @@ class Minifier
                 case $stringType:
                     break 2;
 
-                // New lines in strings without line delimiters are bad- actual
-                // new lines will be represented by the string \n and not the actual
-                // character, so those will be treated just fine using the switch
-                // block below.
+                    // New lines in strings without line delimiters are bad- actual
+                    // new lines will be represented by the string \n and not the actual
+                    // character, so those will be treated just fine using the switch
+                    // block below.
                 case "\n":
-                    throw new \RuntimeException('Unclosed string at position: ' . $startpos );
+                    throw new \RuntimeException('Unclosed string at position: ' . $startpos);
 
-                // Escaped characters get picked up here. If it's an escaped new line it's not really needed
+                    // Escaped characters get picked up here. If it's an escaped new line it's not really needed
                 case '\\':
 
                     // a is a slash. We want to keep it, and the next character,
@@ -487,9 +499,8 @@ class Minifier
                     echo $this->a . $this->b;
                     break;
 
-
-                // Since we're not dealing with any special cases we simply
-                // output the character and continue our loop.
+                    // Since we're not dealing with any special cases we simply
+                    // output the character and continue our loop.
                 default:
                     echo $this->a;
             }
@@ -507,16 +518,18 @@ class Minifier
         echo $this->a . $this->b;
 
         while (($this->a = $this->getChar()) !== false) {
-            if($this->a === '/')
+            if ($this->a === '/') {
                 break;
+            }
 
             if ($this->a === '\\') {
                 echo $this->a;
                 $this->a = $this->getChar();
             }
 
-            if($this->a === "\n")
+            if ($this->a === "\n") {
                 throw new \RuntimeException('Unclosed regex pattern at position: ' . $this->index);
+            }
 
             echo $this->a;
         }
@@ -545,7 +558,7 @@ class Minifier
         /* lock things like <code>"asd" + ++x;</code> */
         $lock = '"LOCK---' . crc32(time()) . '"';
 
-        $matches = array();
+        $matches = [];
         preg_match('/([+-])(\s+)([+-])/S', $js, $matches);
         if (empty($matches)) {
             return $js;
