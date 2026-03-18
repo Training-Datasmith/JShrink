@@ -118,13 +118,10 @@ class Minifier
 
         } catch (\Exception $e) {
 
-            if (isset($jshrink)) {
-                // Since the breakdownScript function probably wasn't finished
-                // we clean it out before discarding it.
-                $jshrink->clean();
-                unset($jshrink);
-            }
-
+            // Since the breakdownScript function probably wasn't finished
+            // we clean it out before discarding it.
+            $jshrink->clean();
+            unset($jshrink);
             // without this call things get weird, with partially outputted js.
             ob_end_clean();
             throw $e;
@@ -224,7 +221,7 @@ class Minifier
                             // check for some regex that breaks stuff
                             if ($this->a === '/' && ($this->b === '\'' || $this->b === '"')) {
                                 $this->saveRegex();
-                                continue;
+                                break;
                             }
 
                             echo $this->a;
@@ -272,7 +269,7 @@ class Minifier
             $char = substr($this->input, $this->index, 1);
 
             // If the next character doesn't exist return false.
-            if (isset($char) && $char === false) {
+            if ($char === false) {
                 return false;
             }
 
@@ -310,11 +307,11 @@ class Minifier
         }
 
         $this->c = $this->getChar();
-
         if ($this->c === '/') {
             return $this->processOneLineComments($startIndex);
+        }
 
-        } elseif ($this->c === '*') {
+        if ($this->c === '*') {
             return $this->processMultiLineComments($startIndex);
         }
 
@@ -338,14 +335,12 @@ class Minifier
         if ($thirdCommentString == '@') {
             $endPoint = $this->index - $startIndex;
             unset($this->c);
-            $char = "\n" . substr($this->input, $startIndex, $endPoint);
-        } else {
-            // first one is contents of $this->c
-            $this->getChar();
-            $char = $this->getChar();
+            return "\n" . substr($this->input, $startIndex, $endPoint);
         }
+        // first one is contents of $this->c
+        $this->getChar();
 
-        return $char;
+        return $this->getChar();
     }
 
     /**
@@ -474,7 +469,6 @@ class Minifier
                 // block below.
                 case "\n":
                     throw new \RuntimeException('Unclosed string at position: ' . $startpos );
-                    break;
 
                 // Escaped characters get picked up here. If it's an escaped new line it's not really needed
                 case '\\':
@@ -558,11 +552,9 @@ class Minifier
         }
 
         $this->locks[$lock] = $matches[2];
-
-        $js = preg_replace('/([+-])\s+([+-])/S', "$1{$lock}$2", $js);
         /* -- */
 
-        return $js;
+        return preg_replace('/([+-])\s+([+-])/S', "$1{$lock}$2", $js);
     }
 
     /**
