@@ -84,13 +84,22 @@ class Minifier
      */
     protected $locks = [];
     /**
-     * Takes a string containing javascript and removes unneeded characters in
-     * order to shrink the code without altering it's functionality.
+     * Takes a string containing JavaScript and removes unneeded characters in
+     * order to shrink the code without altering its functionality.
      *
-     * @param  string      $js      The raw javascript to be minified
-     * @param  array       $options Various runtime options in an associative array
-     * @throws \Exception
-     * @return bool|string
+     * Whitespace, single-line comments (`//`), and multi-line comments (`/* … *\/`)
+     * are stripped.  Flagged comments (`/*! … *\/` and `/*@ … *\/`) are kept by
+     * default so that licence headers survive minification.
+     *
+     * @param  string $js      The raw JavaScript source to be minified.
+     * @param  array{flaggedComments?: bool} $options Runtime options:
+     *                         - `flaggedComments` (bool, default `true`): preserve `/*!` / `/*@` blocks.
+     *
+     * @return string The minified JavaScript string.
+     *
+     * @throws \RuntimeException On unclosed strings, regex patterns, or multi-line comments.
+     *
+     * @complexity O(n) where n = length of the input string
      */
     public static function minify($js, $options = [])
     {
