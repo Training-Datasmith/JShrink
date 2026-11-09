@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 /*
  * This file is part of the JShrink package.
  *
@@ -75,14 +74,14 @@ class Minifier
      *
      * @var array
      */
-    protected static $default_options = ['flaggedComments' => true];
+    protected static $default_options = array('flaggedComments' => true);
     /**
      * Contains lock ids which are used to replace certain code patterns and
      * prevent them from being minified
      *
      * @var array
      */
-    protected $locks = [];
+    protected $locks = array();
     /**
      * Takes a string containing JavaScript and removes unneeded characters in
      * order to shrink the code without altering its functionality.
@@ -91,9 +90,9 @@ class Minifier
      * are stripped.  Flagged comments (`/*! … *\/` and `/*@ … *\/`) are kept by
      * default so that licence headers survive minification.
      *
-     * @param  string $js      The raw JavaScript source to be minified.
-     * @param  array{flaggedComments?: bool} $options Runtime options:
-     *                         - `flaggedComments` (bool, default `true`): preserve `/*!` / `/*@` blocks.
+     * @param string                        $js      The raw JavaScript source to be minified.
+     * @param array{flaggedComments?: bool} $options Runtime options:
+     *                                               - `flaggedComments` (bool, default `true`): preserve `/*!` / `/*@` blocks.
      *
      * @return string The minified JavaScript string.
      *
@@ -101,7 +100,7 @@ class Minifier
      *
      * @complexity O(n) where n = length of the input string
      */
-    public static function minify($js, $options = [])
+    public static function minify($js, $options = array())
     {
         try {
             ob_start();
@@ -112,6 +111,7 @@ class Minifier
             $js = ltrim(ob_get_clean());
             $js = $jshrink->unlock($js);
             unset($jshrink);
+
             return $js;
         } catch (\Exception $e) {
             // Since the breakdownScript function probably wasn't finished
@@ -174,7 +174,7 @@ class Minifier
                         break;
                     }
                     // if B is a space we skip the rest of the switch block and go down to the
-                    // string/regex check below, resetting $this->b with getReal
+                    // string/regex check below, resetting $this->b with get_real
                     if ($this->b === ' ') {
                         break;
                     }
@@ -193,7 +193,7 @@ class Minifier
                                 echo $this->a;
                                 $this->save_string();
                                 break;
-                            } else if (static::is_alpha_numeric($this->a)) {
+                            } elseif (static::is_alpha_numeric($this->a)) {
                                 echo $this->a;
                                 $this->save_string();
                             }
@@ -260,11 +260,12 @@ class Minifier
         if ($char !== "\n" && ord($char) < 32) {
             return ' ';
         }
+
         return $char;
     }
     /**
      * This function gets the next "real" character. It is essentially a wrapper
-     * around the getChar function that skips comments. This has significant
+     * around the get_char function that skips comments. This has significant
      * performance benefits as the skipping is done using native functions (ie,
      * c code) rather than in script php.
      *
@@ -287,13 +288,14 @@ class Minifier
         if ($this->c === '*') {
             return $this->process_multi_line_comments($start_index);
         }
+
         return $char;
     }
     /**
      * Removed one line comments, with the exception of some very specific types of
      * conditional comments.
      *
-     * @param  int    $startIndex The index point where "getReal" function started
+     * @param  int    $start_index The index point where get_real started
      * @return string
      */
     protected function process_one_line_comments($start_index)
@@ -304,17 +306,19 @@ class Minifier
         if ($third_comment_string == '@') {
             $end_point = $this->index - $start_index;
             unset($this->c);
+
             return "\n" . substr($this->input, $start_index, $end_point);
         }
         // first one is contents of $this->c
         $this->get_char();
+
         return $this->get_char();
     }
     /**
      * Skips multiline comments where appropriate, and includes them where needed.
      * Conditional comments and "license" style blocks are preserved.
      *
-     * @param  int               $startIndex The index point where "getReal" function started
+     * @param  int               $start_index The index point where get_real started
      * @return bool|string       False if there's no character
      * @throws \RuntimeException Unclosed comments will throw an error
      */
@@ -345,6 +349,7 @@ class Minifier
                 }
                 $end_point = $this->index - 1 - $start_index;
                 echo substr($this->input, $start_index, $end_point);
+
                 return $char;
             }
         } else {
@@ -357,6 +362,7 @@ class Minifier
         if (isset($this->c)) {
             unset($this->c);
         }
+
         return $char;
     }
     /**
@@ -389,7 +395,7 @@ class Minifier
     protected function save_string()
     {
         $startpos = $this->index;
-        // saveString is always called after a gets cleared, so we push b into
+        // save_string is always called after a gets cleared, so we push b into
         // that spot.
         $this->a = $this->b;
         // If this isn't a string we don't need to do anything.
@@ -480,13 +486,14 @@ class Minifier
     {
         /* lock things like <code>"asd" + ++x;</code> */
         $lock = '"LOCK---' . crc32(time()) . '"';
-        $matches = [];
+        $matches = array();
         preg_match('/([+-])(\s+)([+-])/S', $js, $matches);
         if (empty($matches)) {
             return $js;
         }
         $this->locks[$lock] = $matches[2];
         /* -- */
+
         return preg_replace('/([+-])\s+([+-])/S', "\$1{$lock}\$2", $js);
     }
     /**
@@ -503,6 +510,7 @@ class Minifier
         foreach ($this->locks as $lock => $replacement) {
             $js = str_replace($lock, $replacement, $js);
         }
+
         return $js;
     }
 }

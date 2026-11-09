@@ -3,7 +3,7 @@
 <phpunit bootstrap="./tests/bootstrap.php" colors="true">
     <testsuites>
         <testsuite name="JShrink Test Suite">
-            <directory suffix="Test.php">./tests/JShrink/</directory>
+            <directory suffix="_Test.php">./tests/J_Shrink/</directory>
         </testsuite>
     </testsuites>
     <groups>
@@ -14,10 +14,7 @@
     </groups>
     <filter>
         <whitelist>
-            <directory suffix=".php">./src/JShrink/</directory>
+            <directory suffix=".php">./src/J_Shrink/</directory>
         </whitelist>
     </filter>
-    <logging>
-        <log type="coverage-text" target="php://stdout" showUncoveredFiles="false"/>
-    </logging>
 </phpunit>

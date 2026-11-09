@@ -1,12 +1,5 @@
-#/usr/bin/env/sh
+#!/usr/bin/env sh
 set -e
 
-echo 'Running unit tests.'
-./vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml
- 
-echo ''
-echo ''
-echo ''
-echo 'Testing for Coding Styling Compliance.'
-echo 'All code should follow PSR standards.'
-./vendor/bin/php-cs-fixer fix ./ --level="all" -vv --dry-run
+echo 'Running full system test (PHP 5.3 src lint + PHP 7.2 suite).'
+exec ./scripts/system-test.sh

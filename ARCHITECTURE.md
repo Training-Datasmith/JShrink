@@ -9,10 +9,10 @@ redundant characters from JavaScript source without altering its semantics.
 
 ```
 src/
-  JShrink/
+  J_Shrink/
     Minifier.php   — the single public class
 tests/
-  JShrink/Test/
+  J_Shrink/Test/
     J_Shrink_Test.php  — PHPUnit test suite
 ```
 

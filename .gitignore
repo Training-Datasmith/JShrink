@@ -6,3 +6,5 @@
 /vendor
 /report
 /build
+/.system-test
+.phpunit.result.cache
