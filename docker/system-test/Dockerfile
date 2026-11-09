@@ -2,11 +2,15 @@ FROM php:7.2-cli@sha256:42ffbc0798e4449bbd1e14fc4dcb87774aa1ad1900a09ef6a965bc08
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# php:7.2-cli is Debian buster (archived); use archive.debian.org over HTTPS.
-RUN sed -i -e 's|deb.debian.org/debian|archive.debian.org/debian|g' \
-        -e 's|security.debian.org/debian-security|archive.debian.org/debian-security|g' \
-        /etc/apt/sources.list \
-    && printf 'Acquire::Check-Valid-Until "false";\n' >/etc/apt/apt.conf.d/99no-check-valid-until
+# php:7.2-cli is Debian buster (archived); apt uses https://archive.debian.org only.
+RUN rm -f /etc/apt/sources.list \
+    && printf '%s\n' \
+        'deb https://archive.debian.org/debian buster main' \
+        'deb https://archive.debian.org/debian-security buster/updates main' \
+        'deb https://archive.debian.org/debian buster-updates main' \
+        > /etc/apt/sources.list \
+    && printf 'Acquire::Check-Valid-Until "false";\n' >/etc/apt/apt.conf.d/99no-check-valid-until \
+    && cat /etc/apt/sources.list
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \

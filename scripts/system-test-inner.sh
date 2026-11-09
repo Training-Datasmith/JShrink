@@ -11,16 +11,8 @@ fail_deprecation_output() {
   local stripped
   stripped="$(mktemp)"
   sed -E 's/\x1b\[[0-9;]*[[:alpha:]]//g' "${file}" >"${stripped}"
-  if grep -E '^(PHP[[:space:]]+)?Warning:' "${stripped}" >/dev/null; then
-    echo "${label}: output contains Warning" >&2
-    exit 1
-  fi
-  if grep -E '^(PHP[[:space:]]+)?Deprecated:' "${stripped}" >/dev/null; then
-    echo "${label}: output contains Deprecated" >&2
-    exit 1
-  fi
-  if grep -E '^(PHP[[:space:]]+)?Notice:' "${stripped}" >/dev/null; then
-    echo "${label}: output contains Notice" >&2
+  if grep -E '^(PHP )?(Warning|Deprecated|Notice):' "${stripped}" >/dev/null; then
+    echo "${label}: output contains Warning, Deprecated, or Notice" >&2
     exit 1
   fi
   rm -f "${stripped}"

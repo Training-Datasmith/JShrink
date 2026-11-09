@@ -36,6 +36,7 @@ function run_wrong_sha_demo_installed_php()
     );
     $wrong = $fixture;
     $wrong['versions']['example/org']['reference'] = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+
     return !assert_reference_match(
         $wrong,
         array('example/org' => array('reference' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'alias' => '1.2.3')),
@@ -56,6 +57,7 @@ function run_wrong_sha_demo_installed_json()
     );
     $wrongPackages = $packages;
     $wrongPackages[0]['source']['reference'] = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+
     return !assert_json_packages($wrongPackages, array('example/org' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), true);
 }
 
